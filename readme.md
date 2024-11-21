@@ -22,6 +22,7 @@ Ein große Firma mochte im Rahmen einer Selbstevaluierung ihren MitarbeiterInnen
 * id Mailadresse
 * 2 Typen: Admins und User
 * verschlüsseltes Passwort
+* Email-Verifizierung und Password-Reset-Möglichkeit per [Email](https://medium.com/@seonggil/send-email-with-spring-boot-and-gmail-27c14fc3d859)
 * Role/Authorities
 * Beim Start der Applikation sind mindestens folgende Datensatze in der Datenbank zu speichern:
     * Ein Admin sowie 3 User
