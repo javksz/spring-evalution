@@ -26,13 +26,15 @@ public class Question {
     @Column(length = 200)
     private String longDescription;
 
-    @ElementCollection(targetClass = Answer.class)
-    @Enumerated(EnumType.STRING)
-    @Size(min = 1, max = 1)
-    private List<Answer> answers;
+
+    @OneToMany(mappedBy = "question")
+    private List<QuestionAnswer> answers;
 
     @FutureOrPresent
     private LocalDateTime expirationDate;
 
+    public long countAnswersByType(String answerType) {
+        return answers.stream().filter(a -> a.getAnswer().name().equals(answerType)).count();
+    }
 
 }

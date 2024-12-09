@@ -21,5 +21,26 @@
         <button type="submit">Logout</button>
     </form>
 </div>
+<h1>Frage hinzufügen</h1>
+<div class="container">
+    <form method="post" th:action="@{/admin/addQuestion}">
+        <div>
+            <label for="shortDesc">Title:</label>
+            <input type="text" id="shortDesc" name="shortDesc" placeholder="Title" required />
+        </div>
+        <div>
+            <label for="longDesc">Frage:</label>
+            <input type="text" id="longDesc" name="longDesc" placeholder="Frage" required />
+        </div>
+        <div>
+            <label for="Ablaufdatum">Ablaufdatum:</label>
+            <input type="datetime-local" id="Ablaufdatum" name="expirationDate" required />
+        </div>
+        <button type="submit">Frage hinzufügen</button>
+    </form>
+
+
+</div>
+<a th:href="@{/admin/viewQuestions}">View Questions</a>
 </body>
 </html>

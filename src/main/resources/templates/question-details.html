@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Question Details</title>
+</head>
+<body>
+<h1>Question Details</h1>
+<div>
+    <p><span th:text="${question.shortDescription}"></span></p>
+    <p> <span th:text="${question.longDescription}"></span></p>
+    <form th:action="@{/home/submit}" method="post">
+        <input type="hidden" name="questionId" th:value="${question.id}" />
+        <select name="answer" required>
+            <option value="" disabled selected>Select your answer</option>
+            <option th:each="answer : ${T(at.htlstp.securityuserverwaltung.domain.Answer).values()}"
+                    th:value="${answer}"
+                    th:text="${answer}"></option>
+        </select>
+        <button type="submit">Submit Answer</button>
+    </form>
+</div>
+<a th:href="@{/home}">Back to Questions</a>
+</body>
+</html>

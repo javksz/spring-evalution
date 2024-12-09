@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>View Questions</title>
+</head>
+<body>
+<h1>All Questions</h1>
+<table>
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Question</th>
+    <th>COMPLETELY_AGREE</th>
+    <th>PARTIAL_AGREE</th>
+    <th>NOT_AGREE</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="question : ${questions}">
+    <td th:text="${question.shortDescription}"></td>
+    <td th:text="${question.longDescription}"></td>
+    <td th:text="${question.countAnswersByType('COMPLETELY_AGREE')}"></td>
+    <td th:text="${question.countAnswersByType('PARTIAL_AGREE')}"></td>
+    <td th:text="${question.countAnswersByType('NOT_AGREE')}"></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

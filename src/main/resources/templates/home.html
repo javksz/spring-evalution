@@ -21,5 +21,27 @@
         <button type="submit">Logout</button>
     </form>
 </div>
+
+
+<table>
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Question</th>
+        <th>Ablaufdatum</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="question : ${questions}">
+        <td th:text="${question.getShortDescription()}"></td>
+        <td th:text="${question.getLongDescription()}"></td>
+        <td th:text="${question.getExpirationDate()}"></td>
+        <td>
+            <a th:href="@{/home/questionDetails(id=${question.getId()})}">Frage Beantworten</a>
+        </td>
+
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>
