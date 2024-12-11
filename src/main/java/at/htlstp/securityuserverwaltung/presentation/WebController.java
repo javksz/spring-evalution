@@ -5,7 +5,6 @@ import at.htlstp.securityuserverwaltung.config.auth.UserDto;
 import at.htlstp.securityuserverwaltung.config.mail.OnRegistrationCompleteEvent;
 import at.htlstp.securityuserverwaltung.domain.Answer;
 import at.htlstp.securityuserverwaltung.domain.Question;
-import at.htlstp.securityuserverwaltung.domain.QuestionAnswer;
 import at.htlstp.securityuserverwaltung.persistence.QuestionAnswerRepository;
 import at.htlstp.securityuserverwaltung.persistence.QuestionRepository;
 import at.htlstp.securityuserverwaltung.persistence.TokenRepository;
@@ -39,39 +38,22 @@ public record WebController(UserRepository userRepository,
     String getLogin() {
         return "login";
     }
+
+    @GetMapping("admin/viewQuestions")
+    public String viewQuestions(Model model) {
+        var questions = questionRepository.findAll();
+        model.addAttribute("questions", questions);
+
+
+        return "view-questions";
+    }
+
     @GetMapping("/home/questionDetails")
     public String showQuestionDetails(@RequestParam("id") Long id, Model model) {
         Question question = questionRepository.findById(id).orElseThrow();
         model.addAttribute("question", question);
         return "question-details";
     }
-
-    @PostMapping("/home/submit")
-    public String submitAnswer(@RequestParam("questionId") Long questionId, @RequestParam("answer") String answer, Authentication authentication) {
-        AppUser user = userRepository.findByEmail(authentication.getName()).orElseThrow();
-        Question question = questionRepository.findById(questionId).orElseThrow();
-
-        questionAnswerService.saveAnswer(user, question, Answer.valueOf(answer));
-
-        return "redirect:/home/questionDetails?id=" + questionId;
-    }
-
-    @PostMapping("/admin/addQuestion")
-    public String addQuestion(@RequestParam("longDesc") String question,
-                              @RequestParam("shortDesc") String title,
-                              @RequestParam("expirationDate") String expirationDate) {
-        LocalDateTime expiration = LocalDateTime.parse(expirationDate);
-
-        Question newQuestion = new Question();
-        newQuestion.setShortDescription(title);
-        newQuestion.setLongDescription(question);
-        newQuestion.setExpirationDate(expiration);
-
-        questionRepository.save(newQuestion);
-
-        return "redirect:/admin/viewQuestions";
-    }
-
 
 
     @GetMapping("home")
@@ -90,28 +72,12 @@ public record WebController(UserRepository userRepository,
     }
 
 
-
     @GetMapping("register")
     public String displayRegistration(Model model) {
         model.addAttribute("userDto", new UserDto());
         return "register";
     }
-    @PostMapping("register")
-    public String registerUser(@Valid UserDto userDto,
-                               BindingResult bindingResult,
-                               HttpServletRequest request) {
-        if (bindingResult.hasErrors())
-            return "register";
-        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
-            bindingResult.addError(new ObjectError("userDto", "Email already registered."));
-            return "register";
-        }
-        var encryptedPassword = passwordEncoder.encode(userDto.getPassword());
-        var user = new AppUser(null, userDto.getEmail(),"USER", encryptedPassword);
-        user = userRepository.save(user);
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, request.getLocale(), request.getContextPath()));
-        return "redirect:/login";
-    }
+
 
     @GetMapping("confirmRegistration")
     public String confirmRegistration(Model model, @RequestParam String token) {
@@ -132,6 +98,49 @@ public record WebController(UserRepository userRepository,
         userRepository.save(user);
         return "redirect:/login";
     }
+
+    @PostMapping("/home/submit")
+    public String submitAnswer(@RequestParam("questionId") Long questionId, @RequestParam("answer") String answer, Authentication authentication) {
+        AppUser user = userRepository.findByEmail(authentication.getName()).orElseThrow();
+        Question question = questionRepository.findById(questionId).orElseThrow();
+
+        questionAnswerService.saveAnswer(user, question, Answer.valueOf(answer));
+
+        return "redirect:/home";
+    }
+
+    @PostMapping("/admin/addQuestion")
+    public String addQuestion(@RequestParam("longDesc") String question,
+                              @RequestParam("shortDesc") String title,
+                              @RequestParam("expirationDate") String expirationDate) {
+
+        LocalDateTime expiration = LocalDateTime.parse(expirationDate);
+        Question newQuestion = new Question();
+        newQuestion.setShortDescription(title);
+        newQuestion.setLongDescription(question);
+        newQuestion.setExpirationDate(expiration);
+        questionRepository.save(newQuestion);
+
+        return "redirect:/admin/viewQuestions";
+    }
+
+    @PostMapping("register")
+    public String registerUser(@Valid UserDto userDto,
+                               BindingResult bindingResult,
+                               HttpServletRequest request) {
+        if (bindingResult.hasErrors())
+            return "register";
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
+            bindingResult.addError(new ObjectError("userDto", "Email already registered."));
+            return "register";
+        }
+        var encryptedPassword = passwordEncoder.encode(userDto.getPassword());
+        var user = new AppUser(null, userDto.getEmail(), "USER", encryptedPassword);
+        user = userRepository.save(user);
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, request.getLocale(), request.getContextPath()));
+        return "redirect:/login";
+    }
+
     private void addUserToHTML(Authentication authentication, Model model) {
         var email = authentication.getName();
         var user = userRepository.findByEmail(email);
@@ -139,13 +148,5 @@ public record WebController(UserRepository userRepository,
         model.addAttribute("email", email);
     }
 
-    @GetMapping("admin/viewQuestions")
-    public String viewQuestions(Model model) {
-        var questions = questionRepository.findAll();
-        model.addAttribute("questions", questions);
-
-
-        return "view-questions";
-    }
 
 }

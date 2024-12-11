@@ -85,6 +85,7 @@ public class SecurityConfig {
                         auth    // Reihenfolge wichtig! oben > unten
                                 .requestMatchers(GET, "/", "/home", "/login", "/register").permitAll()
 //                                .requestMatchers("/greeting/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(POST, "/register").permitAll()
                                 .requestMatchers("/home/**").hasRole("USER")
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/**", "/*").authenticated() // anyRequest
